@@ -1,21 +1,41 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard{% endblock %}
-
 {% block content %}
 
-<div class="text-center mt-5">
+<div class="container mt-4">
 
-    <h2>Welcome {{ request.user.username }}</h2>
+    <h2 class="mb-4">Dashboard</h2>
 
-    <p>
-        Role:
-        <strong>{{ request.user.role }}</strong>
-    </p>
+    <div class="row">
 
-    <a href="{% url 'logout' %}" class="btn btn-danger">
-        Logout
-    </a>
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5>Total Notices</h5>
+                    <h2>{{ total_notices }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5>Active Notices</h5>
+                    <h2>{{ active_notices }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-dark bg-warning mb-3">
+                <div class="card-body">
+                    <h5>Total Students</h5>
+                    <h2>{{ total_students }}</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
 
 </div>
 
