@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">{{ title }}</h2>
+
+        <a href="{% url 'students:student_list' %}" class="btn btn-outline-secondary">
+            Back to List
+        </a>
+    </div>
+
+    <form method="post" class="card shadow-sm">
+        {% csrf_token %}
+
+        <div class="card-body">
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label" for="id_name">Name</label>
+                    {{ form.name }}
+                    {{ form.name.errors }}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="id_roll_number">Roll Number</label>
+                    {{ form.roll_number }}
+                    {{ form.roll_number.errors }}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="id_department">Department</label>
+                    {{ form.department }}
+                    {{ form.department.errors }}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="id_year">Year</label>
+                    {{ form.year }}
+                    {{ form.year.errors }}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="id_email">Email</label>
+                    {{ form.email }}
+                    {{ form.email.errors }}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="id_phone">Phone</label>
+                    {{ form.phone }}
+                    {{ form.phone.errors }}
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary">
+                    {{ button_label }}
+                </button>
+
+                <a href="{% url 'students:student_list' %}" class="btn btn-secondary">
+                    Cancel
+                </a>
+            </div>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

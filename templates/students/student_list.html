@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="mb-1">Students</h2>
+            <p class="text-muted mb-0">Search, filter, and manage student records.</p>
+        </div>
+
+        <a href="{% url 'students:student_create' %}" class="btn btn-primary">
+            Add Student
+        </a>
+    </div>
+
+    <form method="get" class="card card-body mb-4 shadow-sm">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="student-search" class="form-label">Search</label>
+                <input
+                    type="text"
+                    id="student-search"
+                    name="q"
+                    value="{{ query }}"
+                    class="form-control"
+                    placeholder="Search by name or roll number">
+            </div>
+
+            <div class="col-md-3">
+                <label for="department-filter" class="form-label">Department</label>
+                <select id="department-filter" name="department" class="form-select">
+                    <option value="">All Departments</option>
+                    {% for department in departments %}
+                        <option value="{{ department }}" {% if selected_department == department %}selected{% endif %}>
+                            {{ department }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label for="year-filter" class="form-label">Year</label>
+                <select id="year-filter" name="year" class="form-select">
+                    <option value="">All Years</option>
+                    {% for value, label in year_choices %}
+                        <option value="{{ value }}" {% if selected_year == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1">Filter</button>
+                <a href="{% url 'students:student_list' %}" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </div>
+    </form>
+
+    {% if students %}
+
+    <div class="table-responsive shadow-sm">
+        <table class="table table-bordered table-hover align-middle mb-0">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>Roll No</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Year</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for student in students %}
+
+                <tr>
+                    <td>{{ student.roll_number }}</td>
+
+                    <td>
+                        <a href="{% url 'students:student_detail' student.pk %}" class="text-decoration-none">
+                            {{ student.name }}
+                        </a>
+                    </td>
+
+                    <td>{{ student.department }}</td>
+                    <td>{{ student.get_year_display }}</td>
+                    <td>{{ student.email }}</td>
+
+                    <td class="text-nowrap">
+                        <a href="{% url 'students:student_detail' student.pk %}" class="btn btn-info btn-sm">
+                            View
+                        </a>
+
+                        <a href="{% url 'students:student_update' student.pk %}" class="btn btn-warning btn-sm">
+                            Edit
+                        </a>
+
+                        <a href="{% url 'students:student_delete' student.pk %}" class="btn btn-danger btn-sm">
+                            Delete
+                        </a>
+                    </td>
+
+                </tr>
+
+            {% empty %}
+
+                <tr>
+                    <td colspan="6" class="text-center py-4">
+                        No students found.
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div class="text-muted">
+            Page {{ students.number }} of {{ students.paginator.num_pages }}
+        </div>
+
+        <nav aria-label="Student pagination">
+            <ul class="pagination mb-0">
+                <li class="page-item {% if not students.has_previous %}disabled{% endif %}">
+                    <a class="page-link" href="{% if students.has_previous %}?q={{ query|urlencode }}&department={{ selected_department|urlencode }}&year={{ selected_year|urlencode }}&page={{ students.previous_page_number }}{% else %}#{% endif %}">Previous</a>
+                </li>
+
+                {% for page_number in students.paginator.page_range %}
+                    <li class="page-item {% if students.number == page_number %}active{% endif %}">
+                        <a class="page-link" href="?q={{ query|urlencode }}&department={{ selected_department|urlencode }}&year={{ selected_year|urlencode }}&page={{ page_number }}">{{ page_number }}</a>
+                    </li>
+                {% endfor %}
+
+                <li class="page-item {% if not students.has_next %}disabled{% endif %}">
+                    <a class="page-link" href="{% if students.has_next %}?q={{ query|urlencode }}&department={{ selected_department|urlencode }}&year={{ selected_year|urlencode }}&page={{ students.next_page_number }}{% else %}#{% endif %}">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    {% else %}
+
+    <div class="alert alert-info mb-0">
+        No students found.
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
