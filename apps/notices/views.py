@@ -3,7 +3,9 @@ from django.contrib.auth.decorators import login_required
 from .models import Notice
 from .forms import NoticeForm
 from django.shortcuts import get_object_or_404
+from django.core.paginator import Paginator
 
+@login_required
 @login_required
 def notice_list(request):
     query = request.GET.get("q")
@@ -17,11 +19,16 @@ def notice_list(request):
     if notice_type:
         notices = notices.filter(notice_type=notice_type)
 
+    paginator = Paginator(notices, 5)   # 5 notices per page
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
     return render(
         request,
         "notices/notice_list.html",
         {
-            "notices": notices,
+            "page_obj": page_obj,
+            "notices": page_obj,
             "query": query,
             "selected_type": notice_type,
             "notice_types": Notice.NOTICE_TYPES,
