@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="card">
+
+        <div class="card-header">
+            <h3>{{ notice.title }}</h3>
+        </div>
+
+        <div class="card-body">
+
+            <p><strong>Type:</strong> {{ notice.notice_type }}</p>
+
+            <p><strong>Description:</strong></p>
+
+            <p>{{ notice.description }}</p>
+
+            <p><strong>Created By:</strong> {{ notice.created_by }}</p>
+
+            <p><strong>Date:</strong> {{ notice.created_at }}</p>
+
+            {% if notice.attachment %}
+                <p>
+                    <strong>Attachment:</strong>
+                    <a href="{{ notice.attachment.url }}" target="_blank">
+                        Download File
+                    </a>
+                </p>
+            {% endif %}
+
+            <a href="{% url 'notice_list' %}" class="btn btn-secondary">
+                Back
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

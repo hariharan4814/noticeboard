@@ -1,10 +1,22 @@
 {% extends "base.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
+
 <div class="text-center mt-5">
-    <h1>🎉 Digital Notice Board</h1>
-    <p>Project setup is working successfully.</p>
+
+    <h2>Welcome {{ request.user.username }}</h2>
+
+    <p>
+        Role:
+        <strong>{{ request.user.role }}</strong>
+    </p>
+
+    <a href="{% url 'logout' %}" class="btn btn-danger">
+        Logout
+    </a>
+
 </div>
+
 {% endblock %}
