@@ -2,19 +2,74 @@
 
 {% block content %}
 
-<div class="container mt-4">
+<div class="container py-4">
 
-    <h2>Add Notice</h2>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="mb-1">Add Notice</h2>
+            <p class="text-muted mb-0">Create or update a notice using the form below.</p>
+        </div>
 
-    <form method="POST" enctype="multipart/form-data">
+        <a href="{% url 'notice_list' %}" class="btn btn-outline-secondary">
+            Back to List
+        </a>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="card shadow-sm">
 
         {% csrf_token %}
 
-        {{ form.as_p }}
+        <div class="card-body">
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
 
-        <button class="btn btn-primary">
-            Save Notice
-        </button>
+            <div class="row g-3">
+                <div class="col-md-12">
+                    <label class="form-label" for="id_title">Title</label>
+                    {{ form.title }}
+                    {{ form.title.errors }}
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label" for="id_description">Description</label>
+                    {{ form.description }}
+                    {{ form.description.errors }}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="id_notice_type">Notice Type</label>
+                    {{ form.notice_type }}
+                    {{ form.notice_type.errors }}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="id_attachment">Attachment</label>
+                    {{ form.attachment }}
+                    {{ form.attachment.errors }}
+                </div>
+
+                <div class="col-12">
+                    <div class="form-check mt-2">
+                        {{ form.is_active }}
+                        <label class="form-check-label" for="id_is_active">Active</label>
+                    </div>
+                    {{ form.is_active.errors }}
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button class="btn btn-primary">
+                    Save Notice
+                </button>
+
+                <a href="{% url 'notice_list' %}" class="btn btn-secondary">
+                    Cancel
+                </a>
+            </div>
+        </div>
 
     </form>
 

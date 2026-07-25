@@ -2,9 +2,20 @@
 
 {% block content %}
 
-<div class="container mt-4">
+<div class="container py-4">
 
-    <div class="card">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="mb-1">Notice Details</h2>
+            <p class="text-muted mb-0">View the full notice information.</p>
+        </div>
+
+        <a href="{% url 'notice_list' %}" class="btn btn-outline-secondary">
+            Back to List
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
 
         <div class="card-header">
             <h3>{{ notice.title }}</h3>
@@ -12,28 +23,66 @@
 
         <div class="card-body">
 
-            <p><strong>Type:</strong> {{ notice.notice_type }}</p>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3 h-100">
+                        <strong class="d-block text-muted small">Type</strong>
+                        <span>{{ notice.notice_type }}</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3 h-100">
+                        <strong class="d-block text-muted small">Created By</strong>
+                        <span>{{ notice.created_by }}</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3 h-100">
+                        <strong class="d-block text-muted small">Date</strong>
+                        <span>{{ notice.created_at|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3 h-100">
+                        <strong class="d-block text-muted small">Status</strong>
+                        {% if notice.is_active %}
+                            <span class="badge bg-success">Active</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
 
-            <p><strong>Description:</strong></p>
-
-            <p>{{ notice.description }}</p>
-
-            <p><strong>Created By:</strong> {{ notice.created_by }}</p>
-
-            <p><strong>Date:</strong> {{ notice.created_at }}</p>
+            <div class="mb-3">
+                <strong class="d-block mb-2">Description</strong>
+                <div class="border rounded-3 p-3 bg-light">
+                    {{ notice.description }}
+                </div>
+            </div>
 
             {% if notice.attachment %}
-                <p>
-                    <strong>Attachment:</strong>
+                <div class="mb-3">
+                    <strong class="d-block mb-2">Attachment</strong>
                     <a href="{{ notice.attachment.url }}" target="_blank">
                         Download File
                     </a>
-                </p>
+                </div>
             {% endif %}
 
-            <a href="{% url 'notice_list' %}" class="btn btn-secondary">
-                Back
-            </a>
+            <div class="d-flex gap-2">
+                <a href="{% url 'notice_update' notice.pk %}" class="btn btn-warning">
+                    Edit
+                </a>
+
+                <a href="{% url 'notice_delete' notice.pk %}" class="btn btn-danger">
+                    Delete
+                </a>
+
+                <a href="{% url 'notice_list' %}" class="btn btn-secondary">
+                    Back
+                </a>
+            </div>
 
         </div>
 

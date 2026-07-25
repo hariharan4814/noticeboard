@@ -1,5 +1,40 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+{% with current=request.resolver_match %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
     <div class="container">
-        <a class="navbar-brand" href="#">Digital Notice Board</a>
+        <a class="navbar-brand fw-semibold" href="{% if request.user.is_authenticated %}{% url 'home' %}{% else %}{% url 'login' %}{% endif %}">
+            Digital Notice Board
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                {% if request.user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if current.url_name == 'home' %}active{% endif %}" {% if current.url_name == 'home' %}aria-current="page"{% endif %} href="{% url 'home' %}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if current.namespace == 'students' %}active{% endif %}" {% if current.namespace == 'students' %}aria-current="page"{% endif %} href="{% url 'students:student_list' %}">Students</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path|slice:':9' == '/notices/' %}active{% endif %}" {% if request.path|slice:':9' == '/notices/' %}aria-current="page"{% endif %} href="{% url 'notice_list' %}">Notices</a>
+                    </li>
+                {% endif %}
+            </ul>
+
+            <div class="d-flex gap-2">
+                {% if request.user.is_authenticated %}
+                    <span class="navbar-text text-white-50 d-none d-lg-inline">
+                        {{ request.user.username }}
+                    </span>
+                    <a class="btn btn-outline-light btn-sm" href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                    <a class="btn btn-outline-light btn-sm" href="{% url 'login' %}">Login</a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </nav>
+{% endwith %}
