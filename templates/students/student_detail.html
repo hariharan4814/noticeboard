@@ -56,13 +56,15 @@
             </div>
 
             <div class="d-flex gap-2 mt-3">
-                <a href="{% url 'students:student_update' student.pk %}" class="btn btn-warning">
-                    Edit
-                </a>
+                {% if request.user.is_staff or request.user.is_superuser %}
+                    <a href="{% url 'students:student_update' student.pk %}" class="btn btn-warning">
+                        Edit
+                    </a>
 
-                <a href="{% url 'students:student_delete' student.pk %}" class="btn btn-danger">
-                    Delete
-                </a>
+                    <a href="{% url 'students:student_delete' student.pk %}" class="btn btn-danger">
+                        Delete
+                    </a>
+                {% endif %}
 
                 <a href="{% url 'students:student_list' %}" class="btn btn-secondary">
                     Back

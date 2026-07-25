@@ -4,6 +4,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
+from apps.common.decorators import staff_or_superuser_required
 from .forms import StudentForm
 from .models import Student
 
@@ -61,6 +62,7 @@ def student_detail(request, pk):
 
 
 @login_required
+@staff_or_superuser_required
 def student_create(request):
     if request.method == "POST":
         form = StudentForm(request.POST)
@@ -85,6 +87,7 @@ def student_create(request):
 
 
 @login_required
+@staff_or_superuser_required
 def student_update(request, pk):
     student = get_object_or_404(Student, pk=pk)
 
@@ -112,6 +115,7 @@ def student_update(request, pk):
 
 
 @login_required
+@staff_or_superuser_required
 def student_delete(request, pk):
     student = get_object_or_404(Student, pk=pk)
 

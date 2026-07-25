@@ -71,13 +71,15 @@
             {% endif %}
 
             <div class="d-flex gap-2">
-                <a href="{% url 'notice_update' notice.pk %}" class="btn btn-warning">
-                    Edit
-                </a>
+                {% if request.user.is_staff or request.user.is_superuser %}
+                    <a href="{% url 'notice_update' notice.pk %}" class="btn btn-warning">
+                        Edit
+                    </a>
 
-                <a href="{% url 'notice_delete' notice.pk %}" class="btn btn-danger">
-                    Delete
-                </a>
+                    <a href="{% url 'notice_delete' notice.pk %}" class="btn btn-danger">
+                        Delete
+                    </a>
+                {% endif %}
 
                 <a href="{% url 'notice_list' %}" class="btn btn-secondary">
                     Back

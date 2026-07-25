@@ -1,11 +1,12 @@
-from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .models import Notice
-from .forms import NoticeForm
-from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
+from django.shortcuts import get_object_or_404, redirect, render
 
-@login_required
+from apps.common.decorators import staff_or_superuser_required
+
+from .forms import NoticeForm
+from .models import Notice
+
 @login_required
 def notice_list(request):
     query = request.GET.get("q")
@@ -37,6 +38,7 @@ def notice_list(request):
 
 
 @login_required
+@staff_or_superuser_required
 def notice_create(request):
     if request.method == "POST":
         form = NoticeForm(request.POST, request.FILES)
@@ -61,6 +63,7 @@ def notice_create(request):
 
 
 @login_required
+@staff_or_superuser_required
 def notice_update(request, pk):
     notice = get_object_or_404(Notice, pk=pk)
 
@@ -81,6 +84,7 @@ def notice_update(request, pk):
 
 
 @login_required
+@staff_or_superuser_required
 def notice_delete(request, pk):
     notice = get_object_or_404(Notice, pk=pk)
 

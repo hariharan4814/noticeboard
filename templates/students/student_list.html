@@ -10,9 +10,11 @@
             <p class="text-muted mb-0">Search, filter, and manage student records.</p>
         </div>
 
-        <a href="{% url 'students:student_create' %}" class="btn btn-primary">
-            Add Student
-        </a>
+        {% if request.user.is_staff or request.user.is_superuser %}
+            <a href="{% url 'students:student_create' %}" class="btn btn-primary">
+                Add Student
+            </a>
+        {% endif %}
     </div>
 
     <form method="get" class="card card-body mb-4 shadow-sm">
@@ -97,13 +99,15 @@
                             View
                         </a>
 
-                        <a href="{% url 'students:student_update' student.pk %}" class="btn btn-warning btn-sm">
-                            Edit
-                        </a>
+                        {% if request.user.is_staff or request.user.is_superuser %}
+                            <a href="{% url 'students:student_update' student.pk %}" class="btn btn-warning btn-sm">
+                                Edit
+                            </a>
 
-                        <a href="{% url 'students:student_delete' student.pk %}" class="btn btn-danger btn-sm">
-                            Delete
-                        </a>
+                            <a href="{% url 'students:student_delete' student.pk %}" class="btn btn-danger btn-sm">
+                                Delete
+                            </a>
+                        {% endif %}
                     </td>
 
                 </tr>
