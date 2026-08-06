@@ -19,7 +19,10 @@
                         <a class="nav-link {% if current.namespace == 'students' %}active{% endif %}" {% if current.namespace == 'students' %}aria-current="page"{% endif %} href="{% url 'students:student_list' %}">Students</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path|slice:':9' == '/notices/' %}active{% endif %}" {% if request.path|slice:':9' == '/notices/' %}aria-current="page"{% endif %} href="{% url 'notice_list' %}">Notices</a>
+                        <a class="nav-link {% if request.path|slice:':9' == '/notices/' and current.url_name != 'attachment_slideshow' %}active{% endif %}" {% if request.path|slice:':9' == '/notices/' and current.url_name != 'attachment_slideshow' %}aria-current="page"{% endif %} href="{% url 'notice_list' %}">Notices</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if current.url_name == 'attachment_slideshow' %}active{% endif %}" {% if current.url_name == 'attachment_slideshow' %}aria-current="page"{% endif %} href="{% url 'attachment_slideshow' %}">Slideshow</a>
                     </li>
                 {% endif %}
             </ul>

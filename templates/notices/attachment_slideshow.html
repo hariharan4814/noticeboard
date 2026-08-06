@@ -1,0 +1,585 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notice Board Slideshow</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS for basic layout & badge components -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --card-bg: rgba(20, 22, 30, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --accent-color: #1f80e0;
+            --text-color: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Slideshow Container */
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, #1a1c24 0%, #0b0c10 100%);
+        }
+
+        /* Slide Styles */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1s ease-in-out, visibility 1s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 2;
+        }
+
+        /* Media Elements */
+        .slide-media-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .slide-img {
+            max-width: 100%;
+            max-height: 82vh;
+            object-fit: contain;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .slide.active .slide-img {
+            transform: scale(1);
+        }
+
+        .slide-iframe-container {
+            width: 85%;
+            height: 80vh;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: #ffffff;
+        }
+
+        .slide-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* General Fallback / Document card */
+        .doc-fallback-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .doc-icon {
+            font-size: 5rem;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+
+        /* Overlay Control Buttons */
+        .ctrl-btn {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .slideshow-container:hover .ctrl-btn,
+        .ctrl-btn.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .ctrl-btn:hover {
+            background: var(--accent-color);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(31, 128, 224, 0.5);
+        }
+
+        .ctrl-btn-prev {
+            left: 30px;
+        }
+
+        .ctrl-btn-next {
+            right: 30px;
+        }
+
+        /* Top Bar Controls */
+        .top-bar {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            z-index: 10;
+            display: flex;
+            gap: 12px;
+            opacity: 0.3;
+            transition: opacity 0.3s ease;
+        }
+
+        .slideshow-container:hover .top-bar,
+        .top-bar:hover {
+            opacity: 1;
+        }
+
+        .top-bar-btn {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .top-bar-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .top-bar-btn.active {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .top-bar-btn-close {
+            background: rgba(220, 53, 69, 0.7);
+        }
+        .top-bar-btn-close:hover {
+            background: rgb(220, 53, 69);
+        }
+
+        /* Caption Panel */
+        .caption-panel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0) 100%);
+            padding: 40px 60px 30px 60px;
+            z-index: 5;
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .caption-content {
+            max-width: 900px;
+            pointer-events: auto;
+        }
+
+        .caption-panel.collapsed {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+
+        .caption-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .caption-desc {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            text-shadow: 0 1px 5px rgba(0,0,0,0.5);
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .caption-meta {
+            font-size: 0.85rem;
+            opacity: 0.6;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Progress Dots */
+        .dots-container {
+            position: absolute;
+            bottom: 25px;
+            right: 50px;
+            z-index: 10;
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: var(--accent-color);
+            transform: scale(1.3);
+            box-shadow: 0 0 8px var(--accent-color);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+        }
+
+        /* Back Icon helper */
+        svg {
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body>
+
+<div class="slideshow-container" id="slideshowContainer">
+
+    <!-- Top Navigation Controls -->
+    <div class="top-bar" id="topBar">
+        <button class="top-bar-btn active" id="playPauseBtn" onclick="togglePlayPause()">
+            <span id="playPauseIcon">⏸</span> <span id="playPauseText">Pause</span>
+        </button>
+        <button class="top-bar-btn" id="infoToggleBtn" onclick="toggleInfoPanel()">
+            <span>ℹ</span> Info Panel
+        </button>
+        <button class="top-bar-btn" id="fullscreenBtn" onclick="toggleFullscreen()">
+            <span>⛶</span> Fullscreen
+        </button>
+        <a href="{% url 'home' %}" class="top-bar-btn top-bar-btn-close">
+            <span>✕</span> Exit
+        </a>
+    </div>
+
+    <!-- Directional Navigation Arrows -->
+    <button class="ctrl-btn ctrl-btn-prev" onclick="prevSlide()" aria-label="Previous Slide">
+        <svg width="24" height="24" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <button class="ctrl-btn ctrl-btn-next" onclick="nextSlide()" aria-label="Next Slide">
+        <svg width="24" height="24" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+    </button>
+
+    {% if notices %}
+        <!-- Slides -->
+        {% for notice in notices %}
+            <div class="slide {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter0 }}">
+                <div class="slide-media-wrapper">
+                    {% if notice.is_image %}
+                        <img src="{{ notice.attachment.url }}" alt="{{ notice.title }}" class="slide-img">
+                    {% elif notice.is_pdf %}
+                        <div class="slide-iframe-container">
+                            <iframe class="slide-iframe" src="{{ notice.attachment.url }}#toolbar=0&navpanes=0&scrollbar=0"></iframe>
+                        </div>
+                    {% else %}
+                        <!-- Non-image/Non-PDF fallback card -->
+                        <div class="doc-fallback-card">
+                            <div class="doc-icon">📎</div>
+                            <h2 class="mb-3">{{ notice.title }}</h2>
+                            <p class="text-muted mb-4">This notice contains a file attachment.</p>
+                            <a href="{{ notice.attachment.url }}" target="_blank" class="btn btn-primary btn-lg px-4">
+                                Download Attachment
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Slide Metadata panel -->
+                <div class="caption-panel" id="captionPanel-{{ forloop.counter0 }}">
+                    <div class="caption-content">
+                        <div class="mb-2">
+                            <span class="badge bg-primary text-uppercase px-2.5 py-1.5">{{ notice.notice_type }}</span>
+                        </div>
+                        <h1 class="caption-title">{{ notice.title }}</h1>
+                        <p class="caption-desc">{{ notice.description|truncatewords:40 }}</p>
+                        <div class="caption-meta">
+                            <span>Posted by: <strong>{{ notice.created_by.username }}</strong></span>
+                            <span>•</span>
+                            <span>Date: <strong>{{ notice.created_at|date:"F d, Y" }}</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        <!-- Progress Indicators -->
+        <div class="dots-container">
+            {% for notice in notices %}
+                <span class="dot {% if forloop.first %}active{% endif %}" onclick="goToSlide({{ forloop.counter0 }})"></span>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <div class="empty-state">
+            <h2 class="text-white opacity-50 mb-3">No Active Notices with Attachments</h2>
+            <p class="text-muted">Once active notices with file attachments are created, they will be listed here.</p>
+            <a href="{% url 'home' %}" class="btn btn-outline-light mt-3">Back to Dashboard</a>
+        </div>
+    {% endif %}
+
+</div>
+
+<!-- JavaScript Logic -->
+<script>
+    let currentIdx = 0;
+    let slides = document.querySelectorAll('.slide');
+    let dots = document.querySelectorAll('.dot');
+    let totalSlides = slides.length;
+    let slideInterval;
+    let isPlaying = true;
+    let showInfo = true;
+    const intervalTime = 7000; // 7 seconds per slide
+
+    function startSlideshow() {
+        if (totalSlides > 1) {
+            slideInterval = setInterval(nextSlide, intervalTime);
+        }
+    }
+
+    function stopSlideshow() {
+        clearInterval(slideInterval);
+    }
+
+    function updateSlideClasses() {
+        slides.forEach((slide, idx) => {
+            if (idx === currentIdx) {
+                slide.classList.add('active');
+            } else {
+                slide.classList.remove('active');
+            }
+        });
+
+        dots.forEach((dot, idx) => {
+            if (idx === currentIdx) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+
+        // Sync caption panel state
+        updateInfoPanelVisibility();
+    }
+
+    function nextSlide() {
+        if (totalSlides === 0) return;
+        currentIdx = (currentIdx + 1) % totalSlides;
+        updateSlideClasses();
+        resetTimer();
+    }
+
+    function prevSlide() {
+        if (totalSlides === 0) return;
+        currentIdx = (currentIdx - 1 + totalSlides) % totalSlides;
+        updateSlideClasses();
+        resetTimer();
+    }
+
+    function goToSlide(index) {
+        currentIdx = index;
+        updateSlideClasses();
+        resetTimer();
+    }
+
+    function resetTimer() {
+        if (isPlaying) {
+            stopSlideshow();
+            startSlideshow();
+        }
+    }
+
+    // Toggle info panel state for all slides
+    function toggleInfoPanel() {
+        showInfo = !showInfo;
+        const btn = document.getElementById('infoToggleBtn');
+        if (showInfo) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+        updateInfoPanelVisibility();
+    }
+
+    function updateInfoPanelVisibility() {
+        slides.forEach((slide, idx) => {
+            const panel = slide.querySelector('.caption-panel');
+            if (panel) {
+                if (showInfo && idx === currentIdx) {
+                    panel.classList.remove('collapsed');
+                } else {
+                    panel.classList.add('collapsed');
+                }
+            }
+        });
+    }
+
+    function togglePlayPause() {
+        const btn = document.getElementById('playPauseBtn');
+        const icon = document.getElementById('playPauseIcon');
+        const text = document.getElementById('playPauseText');
+
+        if (isPlaying) {
+            stopSlideshow();
+            isPlaying = false;
+            btn.classList.remove('active');
+            icon.innerText = '▶';
+            text.innerText = 'Play';
+        } else {
+            isPlaying = true;
+            startSlideshow();
+            btn.classList.add('active');
+            icon.innerText = '⏸';
+            text.innerText = 'Pause';
+        }
+    }
+
+    function toggleFullscreen() {
+        const elem = document.getElementById('slideshowContainer');
+        const btn = document.getElementById('fullscreenBtn');
+
+        if (!document.fullscreenElement) {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { /* Safari */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE11 */
+                elem.msRequestFullscreen();
+            }
+            btn.classList.add('active');
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+            btn.classList.remove('active');
+        }
+    }
+
+    // Event listener for Escape or exit fullscreen check
+    document.addEventListener('fullscreenchange', () => {
+        const btn = document.getElementById('fullscreenBtn');
+        if (!document.fullscreenElement) {
+            btn.classList.remove('active');
+        }
+    });
+
+    // Keyboard navigation support
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ') {
+            nextSlide();
+        } else if (e.key === 'ArrowLeft') {
+            prevSlide();
+        } else if (e.key === 'f' || e.key === 'F') {
+            toggleFullscreen();
+        } else if (e.key === 'i' || e.key === 'I') {
+            toggleInfoPanel();
+        } else if (e.key === 'p' || e.key === 'P') {
+            togglePlayPause();
+        }
+    });
+
+    // Idle mouse cursor hiding helper
+    let mouseTimer;
+    const container = document.getElementById('slideshowContainer');
+    const topBar = document.getElementById('topBar');
+    const nextBtn = document.querySelector('.ctrl-btn-next');
+    const prevBtn = document.querySelector('.ctrl-btn-prev');
+
+    function hideControls() {
+        container.style.cursor = 'none';
+        topBar.style.opacity = '0';
+        if (nextBtn) nextBtn.classList.remove('visible');
+        if (prevBtn) prevBtn.classList.remove('visible');
+    }
+
+    function showControls() {
+        container.style.cursor = 'default';
+        topBar.style.opacity = '1';
+        if (nextBtn) nextBtn.classList.add('visible');
+        if (prevBtn) prevBtn.classList.add('visible');
+        clearTimeout(mouseTimer);
+        mouseTimer = setTimeout(hideControls, 3000);
+    }
+
+    container.addEventListener('mousemove', showControls);
+    container.addEventListener('click', showControls);
+
+    // Initialize
+    updateInfoPanelVisibility();
+    startSlideshow();
+    showControls();
+</script>
+
+</body>
+</html>

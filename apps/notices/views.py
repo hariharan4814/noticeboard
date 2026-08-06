@@ -107,3 +107,12 @@ def notice_detail(request, pk):
         "notices/notice_detail.html",
         {"notice": notice},
     )
+
+@login_required
+def attachment_slideshow(request):
+    notices = Notice.objects.filter(is_active=True).exclude(attachment="").order_by("-created_at")
+    return render(
+        request,
+        "notices/attachment_slideshow.html",
+        {"notices": notices},
+    )

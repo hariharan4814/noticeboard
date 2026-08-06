@@ -39,3 +39,20 @@ class Notice(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def is_image(self):
+        if not self.attachment:
+            return False
+        import mimetypes
+        mime_type, _ = mimetypes.guess_type(self.attachment.name)
+        if mime_type:
+            return mime_type.startswith("image/")
+        ext = self.attachment.name.split(".")[-1].lower()
+        return ext in ["jpg", "jpeg", "png", "gif", "webp", "svg"]
+
+    @property
+    def is_pdf(self):
+        if not self.attachment:
+            return False
+        return self.attachment.name.lower().endswith(".pdf")
